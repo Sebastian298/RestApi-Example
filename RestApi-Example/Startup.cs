@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using RestApi_Example.Data;
 
 namespace RestApi_Example
 {
@@ -26,6 +28,9 @@ namespace RestApi_Example
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddDbContext<RestApi_ExampleContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("RestApi_ExampleContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
