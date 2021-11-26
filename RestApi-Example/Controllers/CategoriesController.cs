@@ -16,37 +16,28 @@ namespace RestApi_Example.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
-        private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
-
         private readonly RestApi_ExampleContext _context;
-
-        public ProductsController(RestApi_ExampleContext context)
+        private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
+        public CategoriesController(RestApi_ExampleContext context)
         {
             _context = context;
         }
 
-        // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
-        {
-            return await _context.Product.ToListAsync();
-        }
-
-        [HttpGet("GetProducts")]
-        public IActionResult GetProducts()
+        [HttpGet("GetCategorys")]
+        public IActionResult GetCategorys()
         {
             var result = new Result();
             result.Success = true;
             result.Title = "Listo!";
             result.Description = "";
             result.Content = new JObject();
-            DataTable dtBrands = new DataTable();
+            DataTable dtCategorys = new DataTable();
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
-                using (SqlCommand cmd = new SqlCommand("API_GetProducts", cnn))
+                using (SqlCommand cmd = new SqlCommand("API_GetCategorys", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cnn.Open();
@@ -54,24 +45,20 @@ namespace RestApi_Example.Controllers
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
                         if (rdr.HasRows)
-                            dtBrands.Load(rdr);
+                            dtCategorys.Load(rdr);
                     }
                 }
-                var jsonProducts = new List<Product>();
-                foreach (DataRow item in dtBrands.Rows)
+                var jsonCategorys = new List<Category>();
+                foreach (DataRow item in dtCategorys.Rows)
                 {
-                    jsonProducts.Add(new Product
+                    jsonCategorys.Add(new Category
                     {
-                        ProductID = int.Parse(item["ProductID"].ToString()),
+                        CategoryID = int.Parse(item["CategoryID"].ToString()),
                         Name = item["Name"].ToString(),
-                        Brand = int.Parse(item["Brand"].ToString()),
-                        Category = int.Parse(item["Category"].ToString()),
-                        Price = double.Parse(item["Price"].ToString()),
-                        Sku = item["Sku"].ToString(),
                         Image = item["Image"].ToString()
                     });
                 }
-                result.Content = jsonProducts;
+                result.Content = jsonCategorys;
                 return StatusCode(200, result);
             }
             catch (Exception ex)
@@ -83,28 +70,22 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, result);
             }
         }
-
         [HttpPost("Create")]
-        public IActionResult CreateProduct(Product objProduct)
+        public IActionResult CreateCategory(Category objCategory)
         {
             var result = new Result();
             result.Success = true;
             result.Title = "Listo!";
-            result.Description = "Product Created";
+            result.Description = "Category Created";
             result.Content = 1;
             try
             {
-                var Price = double.Parse(objProduct.Price.ToString("0.00"));
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
-                using (SqlCommand cmd = new SqlCommand("API_UpdateProduct", cnn))
+                using (SqlCommand cmd = new SqlCommand("API_UpdateCategory", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Name", objProduct.Name);
-                    cmd.Parameters.AddWithValue("@Brand", int.Parse(objProduct.Brand.ToString()));
-                    cmd.Parameters.AddWithValue("@Category", int.Parse(objProduct.Category.ToString()));
-                    cmd.Parameters.AddWithValue("@Price", Price);
-                    cmd.Parameters.AddWithValue("@Sku", objProduct.Sku);
-                    cmd.Parameters.AddWithValue("@Image", objProduct.Image);
+                    cmd.Parameters.AddWithValue("@Name", objCategory.Name);
+                    cmd.Parameters.AddWithValue("@Image", objCategory.Image);
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
@@ -121,27 +102,22 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPut("Update")]
-        public IActionResult UpdateProduct(Product objProduct)
+        public IActionResult UpdateCategory(Category objCategory)
         {
             var result = new Result();
             result.Success = true;
             result.Title = "Listo!";
-            result.Description = "Product Updated";
+            result.Description = "Category Updated";
             result.Content = 1;
             try
             {
-                var Price = double.Parse(objProduct.Price.ToString("0.00"));
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
-                using (SqlCommand cmd = new SqlCommand("API_UpdateProduct", cnn))
+                using (SqlCommand cmd = new SqlCommand("API_UpdateCategory", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ProductID", int.Parse(objProduct.ProductID.ToString()));
-                    cmd.Parameters.AddWithValue("@Name", objProduct.Name);
-                    cmd.Parameters.AddWithValue("@Brand", int.Parse(objProduct.Brand.ToString()));
-                    cmd.Parameters.AddWithValue("@Category", int.Parse(objProduct.Category.ToString()));
-                    cmd.Parameters.AddWithValue("@Price", Price);
-                    cmd.Parameters.AddWithValue("@Sku", objProduct.Sku);
-                    cmd.Parameters.AddWithValue("@Image", objProduct.Image);
+                    cmd.Parameters.AddWithValue("@CategoryID", int.Parse(objCategory.CategoryID.ToString()));
+                    cmd.Parameters.AddWithValue("@Name", objCategory.Name);
+                    cmd.Parameters.AddWithValue("@Image", objCategory.Image);
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
@@ -156,7 +132,6 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, result);
             }
         }
-
         static string GetSecretKey(string file_name) => System.IO.File.ReadAllText(@"C:\applications\.secret-keys\" + file_name + ".txt");
     }
 }

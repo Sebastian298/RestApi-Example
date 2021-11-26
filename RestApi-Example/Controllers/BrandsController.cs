@@ -22,7 +22,7 @@ namespace RestApi_Example.Controllers
     [ApiController]
     public class BrandsController : ControllerBase
     {
-        static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
+        private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
         private readonly RestApi_ExampleContext _context;
 
         public BrandsController(RestApi_ExampleContext context)
