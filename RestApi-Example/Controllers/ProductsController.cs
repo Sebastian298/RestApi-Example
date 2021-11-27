@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -35,6 +36,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpGet("GetProducts")]
+        [Authorize]
         public IActionResult GetProducts()
         {
             var result = new Result();
@@ -85,6 +87,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPost("Create")]
+        [Authorize]
         public IActionResult CreateProduct(Product objProduct)
         {
             var result = new Result();
@@ -121,6 +124,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPut("Update")]
+        [Authorize]
         public IActionResult UpdateProduct(Product objProduct)
         {
             var result = new Result();

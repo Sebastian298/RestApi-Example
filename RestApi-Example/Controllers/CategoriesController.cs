@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -26,6 +27,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpGet("GetCategorys")]
+        [Authorize]
         public IActionResult GetCategorys()
         {
             var result = new Result();
@@ -71,6 +73,7 @@ namespace RestApi_Example.Controllers
             }
         }
         [HttpPost("Create")]
+        [Authorize]
         public IActionResult CreateCategory(Category objCategory)
         {
             var result = new Result();
@@ -102,6 +105,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPut("Update")]
+        [Authorize]
         public IActionResult UpdateCategory(Category objCategory)
         {
             var result = new Result();

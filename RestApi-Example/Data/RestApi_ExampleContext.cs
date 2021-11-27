@@ -19,5 +19,7 @@ namespace RestApi_Example.Data
         public DbSet<RestApi_Example.Models.Brand> Brand { get; set; }
 
         public DbSet<RestApi_Example.Models.Category> Category { get; set; }
+
+        public DbSet<RestApi_Example.Models.Company> Company { get; set; }
     }
 }

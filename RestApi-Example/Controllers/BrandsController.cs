@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -31,6 +32,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPost("Create")]
+        [Authorize]
         public async Task<IActionResult> CreateBrand(Brand objBrand)
         {
             var result = new Result();
@@ -62,6 +64,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpPut("Update")]
+        [Authorize]
         public async Task<IActionResult> UpdateBrand(Brand objBrand)
         {
             var result = new Result();
@@ -94,6 +97,7 @@ namespace RestApi_Example.Controllers
         }
 
         [HttpGet("GetBrands")]
+        [Authorize]
         public IActionResult GetBrands()
         {
             var result = new Result();
