@@ -15,7 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using RestApi_Example.Data;
 using RestApi_Example.Models;
-using RestApi_Example.Resources;
 
 namespace RestApi_Example.Controllers
 {
