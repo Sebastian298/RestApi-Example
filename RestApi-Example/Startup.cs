@@ -46,6 +46,7 @@ namespace RestApi_Example
                 });
             services.AddMvc();
             services.AddControllers();
+            services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddDbContext<RestApi_ExampleContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("RestApi_ExampleContext")));
             services.AddRazorPages();

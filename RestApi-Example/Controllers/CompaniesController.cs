@@ -44,11 +44,11 @@ namespace RestApi_Example.Controllers
         [HttpPost("Create")]
         public IActionResult CreateCompany([FromBody] Company objCompany)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Company Created";
-            result.Content = 1;
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO";
+            jsonRes.Description = "Company Created";
+            jsonRes.Content = 1;
             var CompanyID = 0;
             using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
             using (SqlCommand cmd = new SqlCommand("API_ValidateCompany", cnn))
@@ -73,24 +73,24 @@ namespace RestApi_Example.Controllers
                         cnn.Open();
                         cmd.ExecuteReader();
                     }
-                    return StatusCode(201, result);
+                    return StatusCode(201, jsonRes);
                 }
                 catch (Exception ex)
                 {
-                    result.Success = false;
-                    result.Title = "Error!";
-                    result.Description = $"Error inesperado {ex.Message}";
-                    result.Content = 0;
-                    return StatusCode(500, result);
+                    jsonRes.Success = false;
+                    jsonRes.Title = "Error";
+                    jsonRes.Description = $"Error inesperado {ex.Message}";
+                    jsonRes.Content = 0;
+                    return StatusCode(500, jsonRes);
                 }
             }
             else
             {
-                result.Success = false;
-                result.Title = "Error!";
-                result.Description = "Company Already Exists!";
-                result.Content = 0;
-                return StatusCode(400, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = "Company Already Exists!";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
             }
         }
 
@@ -98,11 +98,11 @@ namespace RestApi_Example.Controllers
         [HttpPost("CreateToken")]
         public IActionResult CreateToken([FromBody] Company objCompany)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Token Created";
-            result.Content = new JObject();
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO!";
+            jsonRes.Description = "Access Token Created";
+            jsonRes.Content = new JObject();
             var resultValidate = "";
             try
             {
@@ -117,11 +117,11 @@ namespace RestApi_Example.Controllers
                 }
                 if (resultValidate.Contains("Company"))
                 {
-                    result.Success = false;
-                    result.Title = "Error!";
-                    result.Description = "Company Does Not Exists";
-                    result.Content = new JObject();
-                    return StatusCode(404, result);
+                    jsonRes.Success = false;
+                    jsonRes.Title = "Error";
+                    jsonRes.Description = "Company Does Not Exists!";
+                    jsonRes.Content = 0;
+                    return StatusCode(404, jsonRes);
 
                 }
                 else if (!resultValidate.Contains("Currently"))
@@ -131,11 +131,9 @@ namespace RestApi_Example.Controllers
                     var Token = GetToken(ref expirationToken);
                     expirationAux = expirationToken;
                     var expires = expirationToken.ToString("hh:mm tt");
-                    var objToken = new List<Token>();
-                    objToken.Add(new Token{ 
-                       AccessToken = Token,
-                       ExpiresHour = expires.ToString()
-                    });
+                    dynamic jsonToken = new JObject();
+                    jsonToken.Token = Token;
+                    jsonToken.ExpirationTime = expires;
                     using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
                     using (SqlCommand cmd = new SqlCommand("API_UpdateToken", cnn))
                     {
@@ -146,25 +144,25 @@ namespace RestApi_Example.Controllers
                         cnn.Open();
                         cmd.ExecuteReader();
                     }
-                    result.Content = objToken;
-                    return StatusCode(201, result);
+                    jsonRes.Content = jsonToken;
+                    return StatusCode(201, jsonRes);
                 }
                 else
                 {
-                    result.Success = false;
-                    result.Title = "Error!";
-                    result.Description = "Currently Active Access Token";
-                    result.Content = new JObject();
-                    return StatusCode(400, result);
+                    jsonRes.Success = false;
+                    jsonRes.Title = "Error!";
+                    jsonRes.Description = "Currently Active Access Token";
+                    jsonRes.Content = 0;
+                    return StatusCode(500, jsonRes);
                 }
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error al generar el access token. Intente de nuevo o contacte a soporte";
-                result.Content = 0;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error!";
+                jsonRes.Description = "Error al generar el access token. Intente de nuevo o contacte a soporte";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
             }
         }
 

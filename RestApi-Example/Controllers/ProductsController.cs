@@ -35,54 +35,56 @@ namespace RestApi_Example.Controllers
             return await _context.Product.ToListAsync();
         }
 
-        [HttpGet("GetProducts")]
+        [HttpGet("GetProducts/{CompanyID}")]
         [Authorize]
-        public IActionResult GetProducts()
+        public IActionResult GetProducts(string CompanyID)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "";
-            result.Content = new JObject();
-            DataTable dtBrands = new DataTable();
+            dynamic jsonRes = new JObject();
+            DataTable dtProducts = new DataTable();
             try
             {
+                jsonRes.Success = true;
+                jsonRes.Title = "COMPLETADO!";
+                jsonRes.Description = "";
+                jsonRes.Content = new JObject();
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
                 using (SqlCommand cmd = new SqlCommand("API_GetProducts", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CompanyID", int.Parse(CompanyID));
                     cnn.Open();
                     cmd.CommandTimeout = 60;
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
                         if (rdr.HasRows)
-                            dtBrands.Load(rdr);
+                            dtProducts.Load(rdr);
                     }
                 }
-                var jsonProducts = new List<Product>();
-                foreach (DataRow item in dtBrands.Rows)
+                JArray arrayProducts = new JArray();
+                foreach (DataRow item in dtProducts.Rows)
                 {
-                    jsonProducts.Add(new Product
-                    {
-                        ProductID = int.Parse(item["ProductID"].ToString()),
-                        Name = item["Name"].ToString(),
-                        Brand = int.Parse(item["Brand"].ToString()),
-                        Category = int.Parse(item["Category"].ToString()),
-                        Price = double.Parse(item["Price"].ToString()),
-                        Sku = item["Sku"].ToString(),
-                        Image = item["Image"].ToString()
+                    arrayProducts.Add(new JObject {
+                        {"ProductID", int.Parse(item["ProductID"].ToString())},
+                        {"Name", item["Name"].ToString()},
+                        {"Brand", int.Parse(item["Brand"].ToString())},
+                        {"Category", int.Parse(item["Category"].ToString())},
+                        {"Price",  double.Parse(item["Price"].ToString())},
+                        {"Sku", item["Sku"].ToString()},
+                        {"Image", item["Image"].ToString()}
                     });
+
                 }
-                result.Content = jsonProducts;
-                return StatusCode(200, result);
+                
+                jsonRes.Content = arrayProducts;
+                return StatusCode(200, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = null;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = null;
+                return StatusCode(500, jsonRes);
             }
         }
 
@@ -90,11 +92,11 @@ namespace RestApi_Example.Controllers
         [Authorize]
         public IActionResult CreateProduct(Product objProduct)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Product Created";
-            result.Content = 1;
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO";
+            jsonRes.Description = "Product Created";
+            jsonRes.Content = 1;
             try
             {
                 var Price = double.Parse(objProduct.Price.ToString("0.00"));
@@ -105,21 +107,22 @@ namespace RestApi_Example.Controllers
                     cmd.Parameters.AddWithValue("@Name", objProduct.Name);
                     cmd.Parameters.AddWithValue("@Brand", int.Parse(objProduct.Brand.ToString()));
                     cmd.Parameters.AddWithValue("@Category", int.Parse(objProduct.Category.ToString()));
+                    cmd.Parameters.AddWithValue("@CompanyID", int.Parse(objProduct.CompanyID.ToString()));
                     cmd.Parameters.AddWithValue("@Price", Price);
                     cmd.Parameters.AddWithValue("@Sku", objProduct.Sku);
                     cmd.Parameters.AddWithValue("@Image", objProduct.Image);
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
-                return StatusCode(201, result);
+                return StatusCode(201, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = 0;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = null;
+                return StatusCode(500, jsonRes);
             }
         }
 
@@ -127,11 +130,11 @@ namespace RestApi_Example.Controllers
         [Authorize]
         public IActionResult UpdateProduct(Product objProduct)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Product Updated";
-            result.Content = 1;
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO";
+            jsonRes.Description = "Product Updated";
+            jsonRes.Content = 1;
             try
             {
                 var Price = double.Parse(objProduct.Price.ToString("0.00"));
@@ -149,15 +152,15 @@ namespace RestApi_Example.Controllers
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
-                return StatusCode(201, result);
+                return StatusCode(201, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = 0;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
             }
         }
 

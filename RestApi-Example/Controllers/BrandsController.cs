@@ -33,13 +33,13 @@ namespace RestApi_Example.Controllers
 
         [HttpPost("Create")]
         [Authorize]
-        public async Task<IActionResult> CreateBrand(Brand objBrand)
+        public IActionResult CreateBrand(Brand objBrand)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Brand Created";
-            result.Content = 1;
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO";
+            jsonRes.Description = "Product Updated";
+            jsonRes.Content = 1;
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
@@ -51,27 +51,27 @@ namespace RestApi_Example.Controllers
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
-                return StatusCode(201, result);
+                return StatusCode(201, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = 0;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
             }
         }
 
         [HttpPut("Update")]
         [Authorize]
-        public async Task<IActionResult> UpdateBrand(Brand objBrand)
+        public IActionResult UpdateBrand(Brand objBrand)
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "Brand Updated";
-            result.Content = 1;
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO!";
+            jsonRes.Description = "Brand Updated";
+            jsonRes.Content = 1;
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
@@ -84,15 +84,15 @@ namespace RestApi_Example.Controllers
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
-                return StatusCode(201, result);
+                return StatusCode(201, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = 0;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
             }
         }
 
@@ -100,12 +100,12 @@ namespace RestApi_Example.Controllers
         [Authorize]
         public IActionResult GetBrands()
         {
-            var result = new Result();
-            result.Success = true;
-            result.Title = "Listo!";
-            result.Description = "";
-            result.Content = new JObject();
+            dynamic jsonRes = new JObject();
             DataTable dtBrands = new DataTable();
+            jsonRes.Success = true;
+            jsonRes.Title = "COMPLETADO!";
+            jsonRes.Description = "";
+            jsonRes.Content = new JObject();
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
@@ -120,26 +120,26 @@ namespace RestApi_Example.Controllers
                             dtBrands.Load(rdr);
                     }
                 }
-                var jsonBrands = new List<Brand>();
+                JArray jsonBrands = new JArray();
                 foreach (DataRow item in dtBrands.Rows)
                 {
-                    jsonBrands.Add(new Brand
+                    jsonBrands.Add(new JObject
                     {
-                        BrandID = int.Parse(item["BrandID"].ToString()),
-                        Name = item["Name"].ToString(),
-                        Image = item["Image"].ToString()
+                        {"BrandID",int.Parse(item["BrandID"].ToString())},
+                        {"Name",item["Name"].ToString()},
+                        {"Image",item["Image"].ToString()}
                     });
                 }
-                result.Content = jsonBrands;
-                return StatusCode(200, result);
+                jsonRes.Content = jsonBrands;
+                return StatusCode(200, jsonRes);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Title = "Error";
-                result.Description = $"Error inesperado {ex.Message}";
-                result.Content = null;
-                return StatusCode(500, result);
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = null;
+                return StatusCode(500, jsonRes);
             }
         }
         static string GetSecretKey(string file_name) => System.IO.File.ReadAllText(@"C:\applications\.secret-keys\" + file_name + ".txt");
