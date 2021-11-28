@@ -152,7 +152,7 @@ namespace RestApi_Example.Controllers
                     jsonRes.Success = false;
                     jsonRes.Title = "Error!";
                     jsonRes.Description = "Currently Active Access Token";
-                    jsonRes.Content = 0;
+                    jsonRes.Content = null;
                     return StatusCode(500, jsonRes);
                 }
             }
