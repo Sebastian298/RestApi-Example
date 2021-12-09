@@ -13,7 +13,7 @@ namespace RestApi_Example.Models
         public string CompanyCode { get; set; }
         [Email]
         public string Email { get; set; }
-
+        public string Password { get; set; }
         public string AccessToken { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace RestApi_Example
 {
     public class Startup
     {
+        private readonly string _MyCors = "MyCors";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -32,6 +33,15 @@ namespace RestApi_Example
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors(options => {
+                options.AddPolicy(name: _MyCors, builder =>
+                {
+                    //builder.WithOrigins("URL"); Esto para dominios especificos
+                    builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")  //Esto para usar con localhost
+                    .AllowAnyHeader().AllowAnyMethod();
+                });
+            });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer
                 (options =>
                 {
@@ -63,13 +73,13 @@ namespace RestApi_Example
             //services.AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>();
             //services.AddDistributedRateLimiting<RedisProcessingStrategy>();
             //services.AddRedisRateLimiting();
-
+            
             services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
             services.AddMvc();
             services.AddControllers();
-            services.AddControllersWithViews().AddNewtonsoftJson();
+            services.AddControllersWithViews().AddNewtonsoftJson(); //Esto para poder mandar mensajes personalizados con jobjects desde controladores con sus status code
             services.AddDbContext<RestApi_ExampleContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("RestApi_ExampleContext")));
             services.AddRazorPages();
@@ -83,6 +93,8 @@ namespace RestApi_Example
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(_MyCors);
             app.UseIpRateLimiting();
             app.UseHttpsRedirection();
             app.UseRouting();

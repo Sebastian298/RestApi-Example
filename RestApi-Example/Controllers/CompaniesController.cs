@@ -40,6 +40,52 @@ namespace RestApi_Example.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("Validate")]
+        public IActionResult ValidateCompany([FromBody] Company objCompany)
+        
+        {
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "LISTO!";
+            jsonRes.Description = "Authenticated";
+            jsonRes.Content = new JObject();
+            var CompanyID = 0;
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlCommand cmd = new SqlCommand("API_ValidateLoginCompany", cnn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Name", objCompany.Name);
+                    cmd.Parameters.AddWithValue("@Email", objCompany.Email);
+                    cmd.Parameters.AddWithValue("@Password", objCompany.Password);
+                    cnn.Open();
+                    CompanyID = (int)cmd.ExecuteScalar();
+                }
+                if (CompanyID == 0)
+                {
+                    jsonRes.Success = false;
+                    jsonRes.Title = "Error";
+                    jsonRes.Description = "Company Does Not Exists!";
+                    jsonRes.Content = null;
+                    return StatusCode(404, jsonRes);
+                }
+                else
+                {
+                    jsonRes.Content.CompanyID = CompanyID;
+                    return StatusCode(202, jsonRes);
+                }
+            }
+            catch (Exception ex)
+            {
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = 0;
+                return StatusCode(500, jsonRes);
+            }
+        }
+        [AllowAnonymous]
         [HttpPost("Create")]
         public IActionResult CreateCompany([FromBody] Company objCompany)
         {
@@ -69,6 +115,7 @@ namespace RestApi_Example.Controllers
                         cmd.Parameters.AddWithValue("@Name", objCompany.Name);
                         cmd.Parameters.AddWithValue("@CompanyCode", objCompany.CompanyCode);
                         cmd.Parameters.AddWithValue("@Email", objCompany.Email);
+                        cmd.Parameters.AddWithValue("@Password", objCompany.Password);
                         cnn.Open();
                         cmd.ExecuteReader();
                     }

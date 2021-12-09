@@ -10,5 +10,6 @@ namespace RestApi_Example.Models
         public int BrandID { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
+        public int CompanyID { get; set; }
     }
 }

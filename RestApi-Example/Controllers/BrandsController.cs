@@ -36,8 +36,8 @@ namespace RestApi_Example.Controllers
         {
             dynamic jsonRes = new JObject();
             jsonRes.Success = true;
-            jsonRes.Title = "LISTO";
-            jsonRes.Description = "Product Updated";
+            jsonRes.Title = "LISTO!";
+            jsonRes.Description = "Brand Created";
             jsonRes.Content = 1;
             try
             {
@@ -47,6 +47,7 @@ namespace RestApi_Example.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Name", objBrand.Name);
                     cmd.Parameters.AddWithValue("@Image", objBrand.Image);
+                    cmd.Parameters.AddWithValue("@CompanyID", objBrand.CompanyID);
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
@@ -95,9 +96,9 @@ namespace RestApi_Example.Controllers
             }
         }
 
-        [HttpGet("GetBrands")]
+        [HttpGet("GetBrands/{CompanyID}")]
         [Authorize]
-        public IActionResult GetBrands()
+        public IActionResult GetBrands(string CompanyID)
         {
             dynamic jsonRes = new JObject();
             DataTable dtBrands = new DataTable();
@@ -111,6 +112,7 @@ namespace RestApi_Example.Controllers
                 using (SqlCommand cmd = new SqlCommand("API_GetBrands", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CompanyID",int.Parse(CompanyID));
                     cnn.Open();
                     cmd.CommandTimeout = 60;
                     using (SqlDataReader rdr = cmd.ExecuteReader())
