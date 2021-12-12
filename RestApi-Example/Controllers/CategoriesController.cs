@@ -25,9 +25,9 @@ namespace RestApi_Example.Controllers
             _context = context;
         }
 
-        [HttpGet("GetCategorys")]
+        [HttpGet("GetCategorys/{CompanyID}")]
         [Authorize]
-        public IActionResult GetCategorys()
+        public IActionResult GetCategorys(string CompanyID)
         {
             dynamic jsonRes = new JObject();
             jsonRes.Success = true;
@@ -41,6 +41,7 @@ namespace RestApi_Example.Controllers
                 using (SqlCommand cmd = new SqlCommand("API_GetCategorys", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CompanyID", int.Parse(CompanyID));
                     cnn.Open();
                     cmd.CommandTimeout = 60;
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -71,6 +72,7 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, jsonRes);
             }
         }
+        
         [HttpPost("Create")]
         [Authorize]
         public IActionResult CreateCategory(Category objCategory)
@@ -88,6 +90,7 @@ namespace RestApi_Example.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Name", objCategory.Name);
                     cmd.Parameters.AddWithValue("@Image", objCategory.Image);
+                    cmd.Parameters.AddWithValue("@CompanyID", objCategory.CompanyID);
                     cnn.Open();
                     cmd.ExecuteReader();
                 }
@@ -102,6 +105,7 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, jsonRes);
             }
         }
+       
         [HttpPut("Update")]
         [Authorize]
         public IActionResult UpdateCategory(Category objCategory)

@@ -10,5 +10,6 @@ namespace RestApi_Example.Models
         public int CategoryID { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
+        public int CompanyID { get; set; }
     }
 }
