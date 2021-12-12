@@ -17,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace RestApi_Example
 {
@@ -45,6 +47,24 @@ namespace RestApi_Example
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer
                 (options =>
                 {
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = async context =>
+                        {
+                            // Call this to skip the default logic and avoid using the default response
+                            context.HandleResponse();
+                            dynamic res = new JObject();
+                            res.Success = false;
+                            res.Title = "Unauthorized";
+                            res.Description = "Refresh the Access Token";
+                            res.Content = 0;
+                            context.Response.StatusCode = 401;
+                            string json = JsonConvert.SerializeObject(res.ToString());
+                            //context.Response.Headers.Append("my-custom-header", "custom-value");
+                            await context.Response.WriteAsync(JsonConvert.DeserializeObject(json).ToString());
+                        }
+                    };
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
