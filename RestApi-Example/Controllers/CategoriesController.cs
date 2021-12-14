@@ -72,6 +72,62 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, jsonRes);
             }
         }
+
+        [HttpPost("GetCategory")]
+        [Authorize]
+        public IActionResult GetCategorysByNames([FromBody] dynamic objCategory)
+        {
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "COMPLETADO!";
+            jsonRes.Description = "";
+            jsonRes.Content = new JObject();
+            DataTable dtCategorys = new DataTable();
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlCommand cmd = new SqlCommand("API_GetCategoryByNames", cnn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CompanyID", int.Parse(objCategory.CompanyID.ToString()));
+                    cmd.Parameters.AddWithValue("@Name", objCategory.Name.ToString());
+                    cnn.Open();
+                    cmd.CommandTimeout = 60;
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.HasRows)
+                            dtCategorys.Load(rdr);
+                        else
+                        {
+                            jsonRes.Success = false;
+                            jsonRes.Title = "ERROR!";
+                            jsonRes.Description = "No se encontró la categoria!";
+                            jsonRes.Content = null;
+                            return StatusCode(200, jsonRes);
+                        }
+                    }
+                }
+                JArray jsonCategorys = new JArray();
+                foreach (DataRow item in dtCategorys.Rows)
+                {
+                    jsonCategorys.Add(new JObject
+                    {
+                        {"CategoryID", int.Parse(item["CategoryID"].ToString())},
+                        {"Name", item["Name"].ToString() }
+                    });
+                }
+                jsonRes.Content = jsonCategorys;
+                return StatusCode(200, jsonRes);
+            }
+            catch (Exception ex)
+            {
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = null;
+                return StatusCode(500, jsonRes);
+            }
+        }
         
         [HttpPost("Create")]
         [Authorize]

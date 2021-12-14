@@ -143,6 +143,62 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, jsonRes);
             }
         }
+
+        [HttpPost("GetBrand")]
+        [Authorize]
+        public IActionResult API_GetBrandByNames([FromBody] dynamic objBrand)
+        {
+            dynamic jsonRes = new JObject();
+            jsonRes.Success = true;
+            jsonRes.Title = "COMPLETADO!";
+            jsonRes.Description = "";
+            jsonRes.Content = new JObject();
+            DataTable dtBrands = new DataTable();
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlCommand cmd = new SqlCommand("API_GetBrandByNames", cnn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CompanyID", int.Parse(objBrand.CompanyID.ToString()));
+                    cmd.Parameters.AddWithValue("@Name", objBrand.Name.ToString());
+                    cnn.Open();
+                    cmd.CommandTimeout = 60;
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.HasRows)
+                            dtBrands.Load(rdr);
+                        else
+                        {
+                            jsonRes.Success = false;
+                            jsonRes.Title = "ERROR!";
+                            jsonRes.Description = "No se encontró la marca!";
+                            jsonRes.Content = null;
+                            return StatusCode(200, jsonRes);
+                        }
+                    }
+                }
+                JArray jsonBrands = new JArray();
+                foreach (DataRow item in dtBrands.Rows)
+                {
+                    jsonBrands.Add(new JObject
+                    {
+                        {"BrandID", int.Parse(item["BrandID"].ToString())},
+                        {"Name", item["Name"].ToString() }
+                    });
+                }
+                jsonRes.Content = jsonBrands;
+                return StatusCode(200, jsonRes);
+            }
+            catch (Exception ex)
+            {
+                jsonRes.Success = false;
+                jsonRes.Title = "Error";
+                jsonRes.Description = $"Error inesperado {ex.Message}";
+                jsonRes.Content = null;
+                return StatusCode(500, jsonRes);
+            }
+        }
         static string GetSecretKey(string file_name) => System.IO.File.ReadAllText(@"C:\applications\.secret-keys\" + file_name + ".txt");
     }
 }

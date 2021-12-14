@@ -216,7 +216,7 @@ namespace RestApi_Example.Controllers
         {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                var time = DateTime.Now.AddMinutes(15);
+                var time = DateTime.Now.AddMinutes(50);
                 var configToken = new JwtSecurityToken(_config["Jwt:Issuer"],
                     _config["Jwt:Audience"],
                     expires: time,
