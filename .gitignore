@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # User-specific files
+*.json
 *.rsuser
 *.suo
 *.user
@@ -70,7 +71,6 @@ ScaffoldingReadMe.txt
 StyleCopReport.xml
 
 # Files built by Visual Studio
-*.json
 *_i.c
 *_p.c
 *_h.h
