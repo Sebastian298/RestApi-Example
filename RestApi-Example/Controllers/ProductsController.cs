@@ -65,9 +65,9 @@ namespace RestApi_Example.Controllers
                     arrayProducts.Add(new JObject {
                         {"ProductID", int.Parse(item["ProductID"].ToString())},
                         {"Name", item["Name"].ToString()},
-                        {"Brand", int.Parse(item["Brand"].ToString())},
-                        {"Category", int.Parse(item["Category"].ToString())},
-                        {"Price",  double.Parse(item["Price"].ToString())},
+                        {"Brand", item["Brand"].ToString()},
+                        {"Category", item["Category"].ToString()},
+                        {"Price",  item["Price"].ToString()},
                         {"Sku", item["Sku"].ToString()},
                         {"Image", item["Image"].ToString()}
                     });
@@ -143,8 +143,6 @@ namespace RestApi_Example.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ProductID", int.Parse(objProduct.ProductID.ToString()));
                     cmd.Parameters.AddWithValue("@Name", objProduct.Name);
-                    cmd.Parameters.AddWithValue("@Brand", int.Parse(objProduct.Brand.ToString()));
-                    cmd.Parameters.AddWithValue("@Category", int.Parse(objProduct.Category.ToString()));
                     cmd.Parameters.AddWithValue("@Price", Price);
                     cmd.Parameters.AddWithValue("@Sku", objProduct.Sku);
                     cmd.Parameters.AddWithValue("@Image", objProduct.Image);

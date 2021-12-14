@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using EASendMail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +26,7 @@ namespace RestApi_Example.Controllers
     {
         private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
         private readonly RestApi_ExampleContext _context;
-        private IConfiguration _config;
-
+        private static IConfiguration _config;
         public CompaniesController(RestApi_ExampleContext context, IConfiguration config)
         {
             _config = config;
@@ -91,8 +92,8 @@ namespace RestApi_Example.Controllers
         {
             dynamic jsonRes = new JObject();
             jsonRes.Success = true;
-            jsonRes.Title = "LISTO";
-            jsonRes.Description = "Company Created";
+            jsonRes.Title = "Company Created";
+            jsonRes.Description = "Revise su correo para obtener su CompanyID";
             jsonRes.Content = 1;
             var CompanyID = 0;
             using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
@@ -117,8 +118,9 @@ namespace RestApi_Example.Controllers
                         cmd.Parameters.AddWithValue("@Email", objCompany.Email);
                         cmd.Parameters.AddWithValue("@Password", objCompany.Password);
                         cnn.Open();
-                        cmd.ExecuteReader();
+                        CompanyID = (int)cmd.ExecuteScalar();
                     }
+                    SendEmail(objCompany.Email, CompanyID);
                     return StatusCode(201, jsonRes);
                 }
                 catch (Exception ex)
@@ -138,6 +140,25 @@ namespace RestApi_Example.Controllers
                 jsonRes.Content = 0;
                 return StatusCode(500, jsonRes);
             }
+        }
+
+        private static void SendEmail(string EmailTo,int CompanyID)
+        {
+            var email = new SmtpMail("TryIt");
+            var from = _config["Credentials:Mail"];
+            var pass = _config["Credentials:Pass"];
+            email.From = from;
+            email.To = EmailTo;
+            email.Subject = "Registro de compa­ñia";
+            email.TextBody = $"Su CompanyID es: {CompanyID}";
+            var server = new SmtpServer("smtp.live.com");
+            server.User = from;
+            server.Password = pass;
+            server.Port = 587;
+            server.ConnectType = SmtpConnectType.ConnectSSLAuto;
+            var client = new EASendMail.SmtpClient();
+            client.SendMailAsync(server, email);
+            return;
         }
 
         [AllowAnonymous]
@@ -211,7 +232,6 @@ namespace RestApi_Example.Controllers
                 return StatusCode(500, jsonRes);
             }
         }
-
         private string GetToken(ref DateTime ExpirationHour)
         {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
