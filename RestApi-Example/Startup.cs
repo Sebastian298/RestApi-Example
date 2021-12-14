@@ -101,7 +101,7 @@ namespace RestApi_Example
             services.AddControllers();
             services.AddControllersWithViews().AddNewtonsoftJson(); //Esto para poder mandar mensajes personalizados con jobjects desde controladores con sus status code
             services.AddDbContext<RestApi_ExampleContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("RestApi_ExampleContext")));
+                    options.UseSqlServer(Configuration.GetConnectionString("ConnectionDB")));
             services.AddRazorPages();
             services.AddSingleton<IIpPolicyStore, DistributedCacheIpPolicyStore>();
         }

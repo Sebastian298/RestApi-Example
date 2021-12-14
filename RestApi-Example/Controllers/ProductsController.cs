@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using RestApi_Example.Data;
 using RestApi_Example.Models;
@@ -18,12 +19,13 @@ namespace RestApi_Example.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
 
         private readonly RestApi_ExampleContext _context;
+        private static IConfiguration _config;
 
-        public ProductsController(RestApi_ExampleContext context)
+        public ProductsController(RestApi_ExampleContext context, IConfiguration config)
         {
+            _config = config;
             _context = context;
         }
 
@@ -46,7 +48,7 @@ namespace RestApi_Example.Controllers
                 jsonRes.Title = "COMPLETADO!";
                 jsonRes.Description = "";
                 jsonRes.Content = new JObject();
-                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                 using (SqlCommand cmd = new SqlCommand("API_GetProducts", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -99,7 +101,7 @@ namespace RestApi_Example.Controllers
             try
             {
                 var Price = double.Parse(objProduct.Price.ToString("0.00"));
-                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                 using (SqlCommand cmd = new SqlCommand("API_UpdateProduct", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -137,7 +139,7 @@ namespace RestApi_Example.Controllers
             try
             {
                 var Price = double.Parse(objProduct.Price.ToString("0.00"));
-                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                 using (SqlCommand cmd = new SqlCommand("API_UpdateProduct", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -161,6 +163,5 @@ namespace RestApi_Example.Controllers
             }
         }
 
-        static string GetSecretKey(string file_name) => System.IO.File.ReadAllText(@"C:\applications\.secret-keys\" + file_name + ".txt");
     }
 }

@@ -24,7 +24,6 @@ namespace RestApi_Example.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private static readonly string connection_string_db_local = GetSecretKey("connection-string-db-local");
         private readonly RestApi_ExampleContext _context;
         private static IConfiguration _config;
         public CompaniesController(RestApi_ExampleContext context, IConfiguration config)
@@ -53,7 +52,7 @@ namespace RestApi_Example.Controllers
             var CompanyID = 0;
             try
             {
-                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                 using (SqlCommand cmd = new SqlCommand("API_ValidateLoginCompany", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -96,7 +95,7 @@ namespace RestApi_Example.Controllers
             jsonRes.Description = "Revise su correo para obtener su CompanyID";
             jsonRes.Content = 1;
             var CompanyID = 0;
-            using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+            using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
             using (SqlCommand cmd = new SqlCommand("API_ValidateCompany", cnn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -109,7 +108,7 @@ namespace RestApi_Example.Controllers
             {
                 try
                 {
-                    using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                    using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                     using (SqlCommand cmd = new SqlCommand("API_UpdateCompany", cnn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
@@ -173,7 +172,7 @@ namespace RestApi_Example.Controllers
             var resultValidate = "";
             try
             {
-                using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                 using (SqlCommand cmd = new SqlCommand("API_ValidateCompany", cnn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -201,7 +200,7 @@ namespace RestApi_Example.Controllers
                     dynamic jsonToken = new JObject();
                     jsonToken.Token = Token;
                     jsonToken.ExpirationTime = expires;
-                    using (SqlConnection cnn = new SqlConnection(connection_string_db_local))
+                    using (SqlConnection cnn = new SqlConnection(_config["ConnectionStrings:ConnectionDB"]))
                     using (SqlCommand cmd = new SqlCommand("API_UpdateToken", cnn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
