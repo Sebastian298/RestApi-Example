@@ -39,8 +39,8 @@ namespace RestApi_Example
             services.AddCors(options => {
                 options.AddPolicy(name: _MyCors, builder =>
                 {
-                    //builder.WithOrigins("URL"); Esto para dominios especificos
-                    builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")  //Esto para usar con localhost
+                    builder.WithOrigins("http://jaimetenorio-001-site1.ftempurl.com") //Esto para dominios especificos
+                    //builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")  //Esto para usar con localhost
                     .AllowAnyHeader().AllowAnyMethod();
                 });
             });
