@@ -196,7 +196,7 @@ namespace RestApi_Example.Controllers
                     var expirationToken = new DateTime();
                     var Token = GetToken(ref expirationToken);
                     expirationAux = expirationToken;
-                    var expires = expirationToken.ToString("hh:mm tt");
+                    var expires = expirationToken.ToString("MM/dd/yyyy h:mm tt");
                     dynamic jsonToken = new JObject();
                     jsonToken.Token = Token;
                     jsonToken.ExpirationTime = expires;
@@ -235,7 +235,7 @@ namespace RestApi_Example.Controllers
         {
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                var time = DateTime.Now.AddMinutes(50);
+                var time = DateTime.Now.AddMinutes(28800);
                 var configToken = new JwtSecurityToken(_config["Jwt:Issuer"],
                     _config["Jwt:Audience"],
                     expires: time,
